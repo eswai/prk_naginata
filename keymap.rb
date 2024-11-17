@@ -482,20 +482,20 @@ end
 
 $kbd.before_report do
   p1 = $kbd.pressed_keys()
-  d = p1.length - pressed_keys.length
+  d = p1.length - $pressed_keys.length
   if d > 0
-    k = subtract(p1, pressed_keys)
+    k = subtract(p1, $pressed_keys)
     puts "press    #{k.join(', ')} : #{p1.join(', ')}"
-    pressed_keys = p1
+    $pressed_keys = p1
     k.each do |k1|
-      # ng_press(k1)
+      ng_press(k1)
     end
   elsif d < 0
-    k = subtract(pressed_keys, p1)
+    k = subtract($pressed_keys, p1)
     puts "release  #{k.join(', ')} : #{p1.join(', ')}"
-    pressed_keys = p1
+    $pressed_keys = p1
     k.each do |k1|
-      # ng_release(k1)
+      ng_release(k1)
     end
   end
 end
