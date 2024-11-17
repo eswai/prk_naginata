@@ -185,6 +185,10 @@ class Naginata
     [[ :NG_J, :NG_K    ], [ :NG_C    ], [ :KC_EXLM, :KC_ENTER                       ]], # ！[改行]
   ]
 
+  NGSHIFT1 = [[:NG_SFT], [:NG_SFT2], [:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA]]
+  NGSHIFT2 = [[:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA], [:NG_SFT], [:NG_SFT2], [:NG_F], [:NG_V], [:NG_J], [:NG_M]]
+  HENSHU = [[:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA]]
+
   def initialize
     @pressed_keys = []
     @nginput = []  # 未変換のキー [[:NG_M], [:NG_J, :NG_W]] (なぎ)のように、同時押しの組み合わせを2次元配列へ格納
@@ -263,7 +267,7 @@ class Naginata
     # あいあう　あいう x
     # ぎょあう　ぎょう x
     # どか どが x 先にFがc/oされてJが残される
-    [[:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA], [:NG_SFT], [:NG_SFT2], [:NG_F], [:NG_V], [:NG_J], [:NG_M]].each do |rs|
+    NGSHIFT2.each do |rs|
       rskc = rs + @nginput[-1]
       # rskc.append(kc)
       # じょじょ よを先に押すと連続シフトしない x
@@ -334,7 +338,7 @@ class Naginata
       end
     else
       f = true
-      [[:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA]].each do |rs|
+      HENSHU.each do |rs|
         if keys.length == 3 and aequal(keys[0...2], rs)
           NGDIC.each do |k|
             if aequal(k[0], rs) and aequal([keys[2]], k[1])
@@ -368,7 +372,7 @@ class Naginata
 
     noc = 0
 
-    if aincludes?([[:NG_SFT], [:NG_SFT2], [:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA]], keys)
+    if aincludes?(NGSHIFT1, keys)
       noc = 2
     elsif [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length > 1
       skc = keys[1...-1]
@@ -382,7 +386,7 @@ class Naginata
       end
     else
       f = true
-      [[:NG_D, :NG_F], [:NG_C, :NG_V], [:NG_J, :NG_K], [:NG_M, :NG_COMMA]].each do |rs|
+      HENSHU.each do |rs|
         if keys.length == 3 and aequal(keys[0...2], rs)
           NGDIC.each do |k|
             if aequal(k[0], rs) and aequal([keys[2]], k[1])

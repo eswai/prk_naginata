@@ -1,4 +1,4 @@
-require './naginata'
+require 'naginata'
 
 # Initialize a Keyboard
 kbd = Keyboard.new
