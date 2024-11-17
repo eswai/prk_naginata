@@ -361,7 +361,7 @@ def ng_type(keys)
   f = true
   $ngdic.each do |k|
     if aequal(skc, k[0] + k[1])
-      $kbd.send_key(k[2].join(", "))
+      $kbd.send_key(k[2])
       f = false
       break
     end
