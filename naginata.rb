@@ -242,19 +242,19 @@ class Naginata
   end
 
   def ng_press(kc)
-    @pressed_keys.concat(kc)
+    @pressed_keys << kc
 
     # 後置シフトはしない
-    if [:NG_SFT, :NG_SFT2].include?(kc)
+    if [:NG_SFT, :NG_SFT2].include?([kc])
       @nginput << kc
     # 前のキーとの同時押しの可能性があるなら前に足す
     # 同じキー連打を除外
     # V, H, EでVHがロールオーバーすると「こくて」=[[V,H], [E]]になる。「こりゃ」は[[V],[H,E]]。
-    elsif @nginput.length > 0 and @nginput[-1][-1] != kc and number_of_candidates(@nginput[-1] + kc) > 0
-      @nginput[-1] = @nginput[-1] + kc
+    elsif @nginput.length > 0 and @nginput[-1][-1] != [kc] and number_of_candidates(@nginput[-1] + [kc]) > 0
+      @nginput[-1] = @nginput[-1] + [kc]
     # 前のキーと同時押しはない
     else
-      @nginput << kc
+      @nginput << [kc]
       @pressed_keys.delete_if{|a| a == :NG_SFT}
     end
 
@@ -282,7 +282,7 @@ class Naginata
   end
 
   def ng_release(kc)
-    @pressed_keys = subtract(@pressed_keys, kc)
+    @pressed_keys.delete_if{|k| k == kc}
 
     # 全部キーを離したらバッファを全部吐き出す
     r = []
