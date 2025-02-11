@@ -1,4 +1,4 @@
-require 'naginata'
+require 'naginata_pico'
 
 # Initialize a Keyboard
 kbd = Keyboard.new
@@ -39,16 +39,9 @@ kbd.add_layer :naginata, %i[
   NG_Q      NG_W      NG_E      NG_R      NG_T      NG_Y      NG_U      NG_I      NG_O      NG_P     
   NG_A      NG_S      NG_D      NG_F      NG_G      NG_H      NG_J      NG_K      NG_L      NG_SCOLON
   NG_Z      NG_X      NG_C      NG_V      NG_B      NG_N      NG_M      NG_COMMA  NG_DOT    NG_SLASH 
-  KC_TRNS   KC_TRNS   KC_TRNS   KC_TRNS   KC_SFT    KC_SFT2   KC_TRNS   KC_TRNS   KC_TRNS   KC_TRNS
+  KC_LCTL   KC_LGUI   KC_LSFT   LOWER     NG_SFT    NG_SFT2   RAISE     KC_LALT   KC_TAB    KC_QUOTE    
 ]
 # +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------
-
-NG_KEYCODE = %i[
-  NG_Q      NG_W      NG_E      NG_R      NG_T      NG_Y      NG_U      NG_I      NG_O      NG_P     
-  NG_A      NG_S      NG_D      NG_F      NG_G      NG_H      NG_J      NG_K      NG_L      NG_SCOLON
-  NG_Z      NG_X      NG_C      NG_V      NG_B      NG_N      NG_M      NG_COMMA  NG_DOT    NG_SLASH 
-  KC_SFT   KC_SFT2
-]
 
 # Tip: You can also switch current layer by single click like this:
 kbd.define_mode_key :RAISE,      [ nil, :naginata , nil, nil ]
