@@ -210,6 +210,8 @@ class Naginata
   def ng_press(kc)
     @pressed_keys << kc
 
+    # puts "press kc=#{kc}, pressed_keys=#{@pressed_keys.to_a}, nginput=#{@nginput}"
+
     # 後置シフトはしない
     if [:NG_SFT, :NG_SFT2].include?(kc)
       @nginput << [kc]
@@ -250,6 +252,8 @@ class Naginata
   def ng_release(kc)
     @pressed_keys.subtract([kc])
 
+    # puts "release kc=#{kc}, pressed_keys=#{@pressed_keys.to_a}, nginput=#{@nginput}"
+
     # 全部キーを離したらバッファを全部吐き出す
     r = []
     if @pressed_keys.length == 0
@@ -257,8 +261,7 @@ class Naginata
         r << ng_type(@nginput.shift)
       end
     else
-      @nginput << []
-      if @nginput.length > 1 or number_of_candidates(@nginput.first) == 1
+      if @nginput.length > 0 and number_of_candidates(@nginput.first) == 1
         r << ng_type(@nginput.shift)
       end
     end
