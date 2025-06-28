@@ -73,8 +73,8 @@ class Naginata
     [ Set[ :NG_SFT ], Set[ :NG_DOT                  ], [ :KC_W, :KC_A                      ]], # わ
     [ Set[ :NG_SFT ], Set[ :NG_C                    ], [ :KC_W, :KC_O                      ]], # を
     [ Set.new       , Set[ :NG_COMMA                ], [ :KC_N, :KC_N                      ]], # ん
-    [ Set.new       , Set[ :NG_Q                    ], [ :KC_V, :KC_U                      ]], # ゔ
-    [ Set[ :NG_SFT ], Set[ :NG_Q                    ], [ :KC_V, :KC_U                      ]], # ゔ
+    [ Set.new       , Set[ :NG_Q                    ], [                                   ]], #
+    [ Set.new       , Set[ :NG_F, :NG_L, :NG_SCOLON ], [ :KC_V, :KC_U                      ]], # ゔ
     [ Set.new       , Set[ :NG_J, :NG_F             ], [ :KC_G, :KC_A                      ]], # が
     [ Set.new       , Set[ :NG_J, :NG_W             ], [ :KC_G, :KC_I                      ]], # ぎ
     [ Set.new       , Set[ :NG_F, :NG_H             ], [ :KC_G, :KC_U                      ]], # ぐ
@@ -185,8 +185,18 @@ class Naginata
     [ Set.new       , Set[ :NG_F, :NG_H, :NG_DOT    ], [ :KC_G, :KC_U, :KC_X, :KC_W, :KC_A ]], # ぐゎ
     [ Set.new       , Set[ :NG_V, :NG_L, :NG_J      ], [ :KC_T, :KC_S, :KC_A               ]], # つぁ
 
-    [Set[ :NG_J, :NG_K ], Set[ :NG_D    ], [ :KC_QUES, :KC_ENTER                       ]], # ？[改行]
-    [Set[ :NG_J, :NG_K ], Set[ :NG_C    ], [ :KC_EXLM, :KC_ENTER                       ]], # ！[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_D    ], [ :KC_QUES, :KC_ENTER                      ]], # ？[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_C    ], [ :KC_EXLM, :KC_ENTER                      ]], # ！[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_Q    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_W    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_E    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_R    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_J, :NG_K     ], Set[ :NG_T    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_M, :NG_COMMA ], Set[ :NG_Q    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_M, :NG_COMMA ], Set[ :NG_W    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_M, :NG_COMMA ], Set[ :NG_E    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_M, :NG_COMMA ], Set[ :NG_R    ], [ :KC_EXLM                                 ]], # ！[改行]
+    [ Set[ :NG_M, :NG_COMMA ], Set[ :NG_T    ], [ :KC_EXLM                                 ]], # ！[改行]
   ].freeze()
 
   NGSHIFT1 = [
@@ -252,7 +262,7 @@ class Naginata
   def ng_release(kc)
     @pressed_keys.subtract([kc])
 
-    # puts "release kc=#{kc}, pressed_keys=#{@pressed_keys.to_a}, nginput=#{@nginput}"
+    # puts ">release kc=#{kc}, pressed_keys=#{@pressed_keys.to_a}, nginput=#{@nginput}"
 
     # 全部キーを離したらバッファを全部吐き出す
     r = []
@@ -323,7 +333,7 @@ class Naginata
       if f
         skc = Set.new(keys)
         NGDIC.each do |k|
-          if k[0].empty? and skc == k[1]
+          if skc == k[0] + k[1]
             noc += 1
             if noc > 1
               break
@@ -333,7 +343,7 @@ class Naginata
       end
     end
 
-    puts "NG num of matches #{noc}"
+    # puts ">NG num of matches #{noc}"
     return noc
   end
 
@@ -342,25 +352,33 @@ class Naginata
 
     noc = 0
 
-    if NGSHIFT1.include?(Set.new(keys))
+    # シフトの単打
+    if [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length == 1
       noc = 2
+    # 編集モードの途中
+    elsif HENSHU.include?(Set.new(keys)) and keys.length == 2
+      noc = 2
+    # シフトの途中
     elsif [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length > 1
       skc = Set.new(keys[1..-1])
       NGDIC.each do |k|
         if k[0].include?(:NG_SFT) and skc.subset?(k[1])  # <=だけ違う
           noc += 1
+          # puts ">if k[0].include?(:NG_SFT) and skc.subset?(k[1])"
           if noc > 1
             break
           end
         end
       end
     else
+      # 編集モード
       f = true
       HENSHU.each do |rs|
         if keys.length == 3 and Set.new(keys[0..1]) == rs
           NGDIC.each do |k|
             if k[0] == rs and Set.new([keys[2]]) == k[1]
               noc = 1
+              # puts ">if k[0] == rs and Set.new([keys[2]]) == k[1]"
               f = false
               break
             end
@@ -368,24 +386,25 @@ class Naginata
           break unless f
         end
       end
+      # 同時押し、単打
       if f
         skc = Set.new(keys)
         NGDIC.each do |k|
-          if k[0].empty? and skc.subset?(k[1])  # <=だけ違う
-            # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
-            if keys.length < k[1].length
-              noc = 2
-              break
-            else
+          k01 = k[0] + k[1]
+          if skc == k01
+              # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
+              # 編集モードがあるので、commaで「ん」と早期確定してはいけない
               noc += 1
               break if noc > 1
-            end
+          elsif skc.subset?(k01) # <=だけ違う
+              noc = 2
+              break
           end
         end
       end
     end
 
-    puts "NG num of candidates #{noc}"
+    # puts "NG num of candidates #{noc}"
     return noc
   end
 
