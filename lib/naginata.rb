@@ -246,7 +246,7 @@ class Naginata
       # rskc.append(kc)
       # じょじょ よを先に押すと連続シフトしない x
       # Falseにすると、がる が　がある になる x
-      if !rs.include?(kc) and rs.subset?(@pressed_keys) and number_of_matches(rskc) > 0
+      if !rs.include?(kc) and !rs.subset?(Set.new(@nginput[-1])) and rs.subset?(@pressed_keys) and number_of_matches(rskc) > 0
         @nginput[-1] = rskc
         break
       end
@@ -350,61 +350,79 @@ class Naginata
   def number_of_candidates(keys)
     return 0 if keys.empty?
 
+    puts ">NG number_of_candidates keys=#{keys}"
+
     noc = 0
 
-    # シフトの単打
-    if [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length == 1
-      noc = 2
-    # 編集モードの途中
-    elsif HENSHU.include?(Set.new(keys)) and keys.length == 2
-      noc = 2
-    # シフトの途中
-    elsif [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length > 1
-      skc = Set.new(keys[1..-1])
+    # 0や1がシフト文字なら
+    case keys.length
+    when 1
+      # 1, 0
       NGDIC.each do |k|
-        if k[0].include?(:NG_SFT) and skc.subset?(k[1])  # <=だけ違う
+        if k[0].superset?(Set.new(keys))
           noc += 1
-          # puts ">if k[0].include?(:NG_SFT) and skc.subset?(k[1])"
-          if noc > 1
-            break
+          break if noc > 1
+        end
+      end
+      # 0, 1
+      NGDIC.each do |k|
+        if k[0].empty? and k[1].superset?(Set.new(keys))
+          noc += 1
+          break if noc > 1
+        end
+      end
+    when 2
+      # 2, 0
+      NGDIC.each do |k|
+        if k[0] == Set.new(keys)
+          noc += 1
+          break if noc > 1
+        end
+      end
+      # 1, 1
+      NGDIC.each do |k|
+        if k[0] == Set.new([keys[0]]) and k[1].superset?(Set.new([keys[1]]))
+          noc += 1
+          break if noc > 1
+        end
+      end
+      # 0, 2
+      NGDIC.each do |k|
+        if k[0].empty? and k[1].superset?(Set.new(keys))
+          if k[1].length > keys.length
+            # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
+            noc = 2
+          else
+            noc += 1
           end
+          break if noc > 1
         end
       end
     else
-      # 編集モード
-      f = true
-      HENSHU.each do |rs|
-        if keys.length == 3 and Set.new(keys[0..1]) == rs
-          NGDIC.each do |k|
-            if k[0] == rs and Set.new([keys[2]]) == k[1]
-              noc = 1
-              # puts ">if k[0] == rs and Set.new([keys[2]]) == k[1]"
-              f = false
-              break
-            end
-          end
-          break unless f
+      # 2, n
+      NGDIC.each do |k|
+        if k[0] == Set.new(keys[0..1]) and k[1].superset?(Set.new(keys[2..-1]))
+          noc += 1
+          break if noc > 1
         end
       end
-      # 同時押し、単打
-      if f
-        skc = Set.new(keys)
-        NGDIC.each do |k|
-          k01 = k[0] + k[1]
-          if skc == k01
-              # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
-              # 編集モードがあるので、commaで「ん」と早期確定してはいけない
-              noc += 1
-              break if noc > 1
-          elsif skc.subset?(k01) # <=だけ違う
-              noc = 2
-              break
-          end
+      # 1, n
+      NGDIC.each do |k|
+        if k[0] == Set.new([keys[0]]) and k[1].superset?(Set.new(keys[1..-1]))
+          noc += 1
+          break if noc > 1
+        end
+      end
+      # 0, n
+      NGDIC.each do |k|
+        if k[0].empty? and k[1].superset?(Set.new(keys))
+          noc += 1
+          break if noc > 1
         end
       end
     end
 
-    # puts "NG num of candidates #{noc}"
+    puts "NG num of candidates #{noc}"
     return noc
   end
 
