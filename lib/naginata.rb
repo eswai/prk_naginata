@@ -303,65 +303,42 @@ class Naginata
 
     noc = 0
 
-    # 0や1がシフト文字なら
-    case keys.length
-    when 1
-      # 1, 0
-      NGDIC.each do |k|
+    NGDIC.each do |k|
+      case keys.length
+      when 1
+        # 1, 0
         if k[0] == Set.new(keys)
           noc += 1
-          break if noc > 1
         end
-      end
-      # 0, 1
-      NGDIC.each do |k|
+        # 0, 1
         if k[0].empty? and k[1] == Set.new(keys)
           noc += 1
-          break if noc > 1
         end
-      end
-    when 2
-      # 2, 0
-      NGDIC.each do |k|
+      when 2
+        # 2, 0
         if k[0] == Set.new(keys)
           noc += 1
-          break if noc > 1
         end
-      end
-      # 1, 1
-      NGDIC.each do |k|
+        # 1, 1
         if k[0] == Set.new([keys[0]]) and k[1] == Set.new([keys[1]])
           noc += 1
-          break if noc > 1
         end
-      end
-      # 0, 2
-      NGDIC.each do |k|
+        # 0, 2
         if k[0].empty? and k[1] == Set.new(keys)
           noc += 1
-          break if noc > 1
         end
-      end
-    else
-      # 2, n
-      NGDIC.each do |k|
+      else
+        # 2, n
         if k[0] == Set.new(keys[0..1]) and k[1] == Set.new(keys[2..-1])
           noc += 1
-          break if noc > 1
         end
-      end
-      # 1, n
-      NGDIC.each do |k|
+        # 1, n
         if k[0] == Set.new([keys[0]]) and k[1] == Set.new(keys[1..-1])
           noc += 1
-          break if noc > 1
         end
-      end
-      # 0, n
-      NGDIC.each do |k|
+        # 0, n
         if k[0].empty? and k[1] == Set.new(keys)
           noc += 1
-          break if noc > 1
         end
       end
     end
@@ -377,42 +354,33 @@ class Naginata
 
     noc = 0
 
-    # 0や1がシフト文字なら
-    case keys.length
-    when 1
-      # 1, 0
-      NGDIC.each do |k|
+    NGDIC.each do |k|
+      case keys.length
+      when 1
+        # 1, 0
         if k[0].superset?(Set.new(keys))
           noc += 1
           break if noc > 1
         end
-      end
-      # 0, 1
-      NGDIC.each do |k|
+        # 0, 1
         if k[0].empty? and k[1].superset?(Set.new(keys))
           noc += 1
           break if noc > 1
         end
-      end
-    when 2
-      # 2, 0
-      NGDIC.each do |k|
+      when 2
+        # 2, 0
         if k[0] == Set.new(keys)
           noc += 1
           break if noc > 1
         end
-      end
-      # 1, 1
-      NGDIC.each do |k|
+        # 1, 1
         if k[0] == Set.new([keys[0]]) and k[1].superset?(Set.new([keys[1]]))
           noc += 1
           break if noc > 1
         end
-      end
-      # 0, 2
-      NGDIC.each do |k|
+        # 0, 2
         if k[0].empty? and k[1].superset?(Set.new(keys))
-          if k[1].length > keys.length
+          if k[1].length > 2
             # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
             noc = 2
           else
@@ -420,24 +388,18 @@ class Naginata
           end
           break if noc > 1
         end
-      end
-    else
-      # 2, n
-      NGDIC.each do |k|
+      else
+        # 2, n
         if k[0] == Set.new(keys[0..1]) and k[1].superset?(Set.new(keys[2..-1]))
           noc += 1
           break if noc > 1
         end
-      end
-      # 1, n
-      NGDIC.each do |k|
+        # 1, n
         if k[0] == Set.new([keys[0]]) and k[1].superset?(Set.new(keys[1..-1]))
           noc += 1
           break if noc > 1
         end
-      end
-      # 0, n
-      NGDIC.each do |k|
+        # 0, n
         if k[0].empty? and k[1].superset?(Set.new(keys))
           noc += 1
           break if noc > 1
