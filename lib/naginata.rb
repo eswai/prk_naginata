@@ -303,42 +303,65 @@ class Naginata
 
     noc = 0
 
-    # skc = set(map(lambda x: :NG_SFT if x == :NG_SFT2 else x, keys))
-    if [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length == 1
-      noc = 1
-    elsif [:NG_SFT, :NG_SFT2].include?(keys[0]) and keys.length > 1
-      skc = Set.new(keys[1..-1])
+    # 0や1がシフト文字なら
+    case keys.length
+    when 1
+      # 1, 0
       NGDIC.each do |k|
-        if k[0].include?(:NG_SFT) and skc == k[1]
+        if k[0] == Set.new(keys)
           noc += 1
-          if noc > 1
-            break
-          end
+          break if noc > 1
+        end
+      end
+      # 0, 1
+      NGDIC.each do |k|
+        if k[0].empty? and k[1] == Set.new(keys)
+          noc += 1
+          break if noc > 1
+        end
+      end
+    when 2
+      # 2, 0
+      NGDIC.each do |k|
+        if k[0] == Set.new(keys)
+          noc += 1
+          break if noc > 1
+        end
+      end
+      # 1, 1
+      NGDIC.each do |k|
+        if k[0] == Set.new([keys[0]]) and k[1] == Set.new([keys[1]])
+          noc += 1
+          break if noc > 1
+        end
+      end
+      # 0, 2
+      NGDIC.each do |k|
+        if k[0].empty? and k[1] == Set.new(keys)
+          noc += 1
+          break if noc > 1
         end
       end
     else
-      f = true
-      HENSHU.each do |rs|
-        if keys.length == 3 and Set.new(keys[0..1]) == rs
-          NGDIC.each do |k|
-            if k[0] == rs and Set.new([keys[2]]) == k[1]
-              noc = 1
-              f = false
-              break
-            end
-          end
-          break unless f
+      # 2, n
+      NGDIC.each do |k|
+        if k[0] == Set.new(keys[0..1]) and k[1] == Set.new(keys[2..-1])
+          noc += 1
+          break if noc > 1
         end
       end
-      if f
-        skc = Set.new(keys)
-        NGDIC.each do |k|
-          if skc == k[0] + k[1]
-            noc += 1
-            if noc > 1
-              break
-            end
-          end
+      # 1, n
+      NGDIC.each do |k|
+        if k[0] == Set.new([keys[0]]) and k[1] == Set.new(keys[1..-1])
+          noc += 1
+          break if noc > 1
+        end
+      end
+      # 0, n
+      NGDIC.each do |k|
+        if k[0].empty? and k[1] == Set.new(keys)
+          noc += 1
+          break if noc > 1
         end
       end
     end
